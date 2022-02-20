@@ -38,14 +38,15 @@ class Block {
     let self = this;
     // console.log(`in validate: ${JSON.stringify(self)}`);
     const originalHash = self.hash;
-    // console.log(originalHash);
+    // console.log(`originalHash ${originalHash}`);
     self.hash = null;
     const validateHash = SHA256(JSON.stringify(self)).toString();
     self.hash = originalHash;
+    // console.log(`self.hash reassigned ${self.hash}`);
     // console.log(validateHash);
     if (validateHash === originalHash) return true;
     else {
-      console.log(`Block height: ${self.height} is invalid`);
+      console.log(`Block #${self.height} is invalid`);
       throw new Error('Hash not match!');
     }
 

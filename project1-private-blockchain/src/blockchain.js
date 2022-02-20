@@ -78,6 +78,7 @@ class Blockchain {
       //   console.log(block);
       self.chain.push(block);
       //   console.log(self);
+      self.validateChain();
       return block;
     } catch (error) {
       throw new Error('Error adding block!');
@@ -123,16 +124,27 @@ class Blockchain {
   async submitStar(address, message, signature, star) {
     try {
       let self = this;
-      if (bitcoinMessage.verify(message, address, signature)) {
-        const result = await this._addBlock(
-          new BlockClass.Block({ owner: address, star: star })
-        );
-        // console.log(result);
-        return result;
+      const signatureTime = parseInt(message.split(':')[1]);
+      const currentTime = parseInt(
+        new Date().getTime().toString().slice(0, -3)
+      );
+      if (currentTime - signatureTime < 300) {
+        if (bitcoinMessage.verify(message, address, signature)) {
+          const result = await this._addBlock(
+            new BlockClass.Block({ owner: address, star: star })
+          );
+          // console.log(result);
+          return result;
+        } else {
+          console.log('Error in verifying submitted message!');
+          throw new Error('Error in verifying submitted message!');
+        }
       } else {
-        throw new Error('Error in verifying submitted message!');
+        console.log('Time elapsed is more than 5 minutes');
+        throw new Error('Time elapsed is more than 5 minutes');
       }
     } catch (error) {
+      console.log(error);
       throw new Error('Error registering new Block!');
     }
     // return new Promise(async (resolve, reject) => {});
@@ -211,20 +223,25 @@ class Blockchain {
     try {
       let self = this;
       let errorLog = [];
-      //   console.log(`chain 0: ${JSON.stringify(self.chain[0])}`);
 
-      //   const result = await self.chain[1].validate();
-
-      //   console.log(`validation result: ${result}`);
-      //   const tempBlock = new BlockClass.Block('');
-      //   tempBlock = self.chain[0];
-      //   console.log(tempBlock);
-
-      //   console.log(self.chain);
       const asyncRes = await Promise.all(
         self.chain.map(async (block) => {
           const result = await block.validate();
-          errorLog.push(result);
+          if (result) {
+            if (block.height == 0) {
+              console.log(`Block #${block.height} validated`);
+            } else if (block.height != 0) {
+              if (
+                block.previousBlockHash === self.chain[block.height - 1].hash
+              ) {
+                console.log(`Block #${block.height} validated`);
+              } else {
+                errorLog.push(`Block #${block.height} is invalid`);
+              }
+            }
+          } else {
+            errorLog.push(`Block #${block.height} is invalid`);
+          }
         })
       );
       return errorLog;
