@@ -36,27 +36,16 @@ class Block {
    */
   async validate() {
     let self = this;
-    // console.log(`in validate: ${JSON.stringify(self)}`);
     const originalHash = self.hash;
-    // console.log(`originalHash ${originalHash}`);
     self.hash = null;
     const validateHash = SHA256(JSON.stringify(self)).toString();
     self.hash = originalHash;
-    // console.log(`self.hash reassigned ${self.hash}`);
-    // console.log(validateHash);
+
     if (validateHash === originalHash) return true;
     else {
       console.log(`Block #${self.height} is invalid`);
       throw new Error('Hash not match!');
     }
-
-    // return new Promise((resolve, reject) => {
-    //   // Save in auxiliary variable the current block hash
-    //   // Recalculate the hash of the Block
-    //   // Comparing if the hashes changed
-    //   // Returning the Block is not valid
-    //   // Returning the Block is valid
-    // });
   }
 
   /**
@@ -71,11 +60,6 @@ class Block {
   async getBData() {
     let self = this;
     if (self.height != 0) return JSON.parse(hex2ascii(self.body));
-
-    // Getting the encoded data saved in the Block
-    // Decoding the data to retrieve the JSON representation of the object
-    // Parse the data to an object to be retrieve.
-    // Resolve with the data if the object isn't the Genesis block
   }
 }
 
