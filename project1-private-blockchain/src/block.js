@@ -36,12 +36,16 @@ class Block {
    */
   async validate() {
     let self = this;
-    const originalHash = self.hash;
-    self.hash = null;
-    const validateHash = SHA256(JSON.stringify(self)).toString();
-    self.hash = originalHash;
-
-    if (validateHash === originalHash) return true;
+    if (
+      self.hash ===
+      SHA256(
+        JSON.stringify({
+          ...self,
+          hash: null,
+        })
+      ).toString()
+    )
+      return true;
     else {
       console.log(`Block #${self.height} is invalid`);
       throw new Error('Hash not match!');
