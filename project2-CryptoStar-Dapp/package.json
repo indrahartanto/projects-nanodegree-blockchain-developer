@@ -3,6 +3,7 @@
     "prettier": "prettier --write contracts/**/*.sol"
   },
   "dependencies": {
+    "@truffle/hdwallet-provider": "^2.0.5",
     "openzeppelin-solidity": "^2.2.0"
   },
   "devDependencies": {
