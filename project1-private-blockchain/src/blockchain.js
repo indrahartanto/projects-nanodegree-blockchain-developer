@@ -71,20 +71,19 @@ class Blockchain {
       if (self.chain.length > 0) {
         block.previousBlockHash = self.chain[self.chain.length - 1].hash;
       }
-      //   console.log(`height: ${block.height}`);
-      //   console.log(JSON.stringify(block));
       block.hash = SHA256(JSON.stringify(block)).toString();
-
-      //   console.log(block);
       self.chain.push(block);
-      //   console.log(self);
-      self.validateChain();
-      return block;
+      const results = await self.validateChain();
+      if (results.length == 0) return block;
+      else {
+        self.chain.pop();
+        console.log('Error in chain validation!');
+        console.log(results);
+        throw new Error('Error in chain validation!');
+      }
     } catch (error) {
       throw new Error('Error adding block!');
     }
-    // return new Promise(async (resolve, reject) => {
-    // });
   }
 
   /**
@@ -101,7 +100,6 @@ class Blockchain {
       new Date().getTime().toString().slice(0, -3),
       ':starRegistry'
     );
-    // return new Promise((resolve) => {});
   }
 
   /**
@@ -133,7 +131,6 @@ class Blockchain {
           const result = await this._addBlock(
             new BlockClass.Block({ owner: address, star: star })
           );
-          // console.log(result);
           return result;
         } else {
           console.log('Error in verifying submitted message!');
@@ -147,7 +144,6 @@ class Blockchain {
       console.log(error);
       throw new Error('Error registering new Block!');
     }
-    // return new Promise(async (resolve, reject) => {});
   }
 
   /**
@@ -160,12 +156,10 @@ class Blockchain {
     try {
       let self = this;
       const result = self.chain.filter((block) => block.hash === hash)[0];
-      //   console.log(result);
       return result;
     } catch (error) {
       throw new Error('Error in getting block by hash!');
     }
-    // return new Promise((resolve, reject) => {});
   }
 
   /**
@@ -176,8 +170,7 @@ class Blockchain {
   getBlockByHeight(height) {
     let self = this;
     return new Promise((resolve, reject) => {
-      let block = self.chain.filter((p) => p.height === height)[0];
-      //   console.log(block);
+      let block = self.chain.find((p) => p.height === height);
       if (block) {
         resolve(block);
       } else {
@@ -210,7 +203,6 @@ class Blockchain {
     } catch (error) {
       throw new Error('Error in getting block by wallet address');
     }
-    // return new Promise((resolve, reject) => {});
   }
 
   /**
@@ -248,72 +240,7 @@ class Blockchain {
     } catch (error) {
       throw new Error('Error validating chain!');
     }
-    // return new Promise(async (resolve, reject) => {});
   }
 }
 
 module.exports.Blockchain = Blockchain;
-
-// const test = async () => {
-//   try {
-//     const blockchain = new Blockchain();
-
-//     // console.log(
-//     //   blockchain.requestMessageOwnershipVerification(
-//     //     '1LPpX52fiwusu2VWzy6UDm9qxbQbPt9wMY'
-//     //   )
-//     // );
-
-//     const star = {
-//       dec: "68° 52' 56.9",
-//       ra: '16h 29m 1.0s',
-//       story: 'Testing the story 4',
-//     };
-//     const star2 = {
-//       dec: "1° 1' 1",
-//       ra: '1h 1m 1.0s',
-//       story: '1Testing the story 1',
-//     };
-//     const address = '1LPpX52fiwusu2VWzy6UDm9qxbQbPt9wMY';
-//     const message =
-//       '1LPpX52fiwusu2VWzy6UDm9qxbQbPt9wMY:1645341645:starRegistry';
-//     const signature =
-//       'HxagA1/e7vtl9ZJtXLGpdsL3S0H4pW+2QQ++0kcwzJqLVczILwKU+VaMDFJ87tVr6/3waRHct5nLBVPnzEyh5+U=';
-
-//     const address2 = '1ED5FnwxN4XuXPH8NM8Ge2MbeczGeDhT1c';
-//     const message2 =
-//       '1ED5FnwxN4XuXPH8NM8Ge2MbeczGeDhT1c:1645341645:starRegistry';
-//     const signature2 =
-//       'IAX0BGxxPiw/6EsRv9Nd2gZABhOeRU0QrgZGveh6vhItXo/sJXDfLWuV03EYk+v+8cZ+esnuOJa8YnMDO/q2X28=';
-
-//     const result = JSON.stringify(
-//       await blockchain.submitStar(address, message, signature, star)
-//     );
-
-//     const result2 = JSON.stringify(
-//       await blockchain.submitStar(address2, message2, signature2, star)
-//     );
-
-//     const result3 = JSON.stringify(
-//       await blockchain.submitStar(address, message, signature, star2)
-//     );
-
-//     const searchResult = await blockchain.getBlockByHash(
-//       JSON.parse(result2).hash
-//     );
-//     // console.log(searchResult);
-
-//     const validateResult = await blockchain.validateChain();
-//     // console.log(validateResult);
-
-//     // console.log(blockchain.getBlockByHeight(2));
-
-//     blockchain.getStarsByWalletAddress(address2);
-
-//     // console.log(blockchain);
-//   } catch (error) {
-//     console.log(error.message);
-//   }
-// };
-
-// test();
